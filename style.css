@@ -561,6 +561,17 @@ footer {
   background: #fff;
 }
 
+/* Lightbox title — positioned via JS to align with actual video edges */
+.lightbox__title {
+  position: absolute;
+  font-family: var(--font-family);
+  font-size: clamp(0.75rem, 1.1vw, 0.9rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+  pointer-events: none;
+}
+
 /* Lightbox prev / next arrows — fixed at the edges of a 16:9 reference box,
    independent of the actual video aspect ratio */
 .lightbox {

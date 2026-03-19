@@ -179,6 +179,7 @@ const lightboxInner  = document.getElementById('lightboxInner');
 const lightboxVimeo  = document.getElementById('lightboxVimeo');
 const lightboxPrev   = document.getElementById('lightboxPrev');
 const lightboxNext   = document.getElementById('lightboxNext');
+const lightboxTitle  = document.getElementById('lightboxTitle');
 const bgVideo        = document.querySelector('.video-bg');
 
 const SHOW_REEL_ID = '1174593058';
@@ -215,6 +216,13 @@ function setLightboxVideo(videoId, aspectRatio) {
   lightboxInner.style.width  = `${w}px`;
   lightboxInner.style.height = `${h}px`;
 
+  // Align title with the actual video's left edge and bottom
+  if (lightboxTitle) {
+    lightboxTitle.style.left  = `calc(50% - ${w / 2}px)`;
+    lightboxTitle.style.top   = `calc(50% + ${h / 2}px + 0.75rem)`;
+    lightboxTitle.style.width = `${w}px`;
+  }
+
   lightboxVimeo.innerHTML = `<iframe
     src="https://player.vimeo.com/video/${videoId}?autoplay=1&color=ffffff&title=0&byline=0&portrait=0"
     frameborder="0"
@@ -223,7 +231,7 @@ function setLightboxVideo(videoId, aspectRatio) {
   lightboxVimeo.classList.add('active');
 }
 
-function openVimeoLightbox(videoId, aspectRatio, galleryIndex) {
+function openVimeoLightbox(videoId, aspectRatio, galleryIndex, title) {
   currentGalleryIndex = galleryIndex !== undefined ? galleryIndex : -1;
 
   // Suspend scroll hint while show reel is open
@@ -233,6 +241,7 @@ function openVimeoLightbox(videoId, aspectRatio, galleryIndex) {
   }
 
   setLightboxVideo(videoId, aspectRatio);
+  if (lightboxTitle) lightboxTitle.textContent = title || '';
 
   if (currentGalleryIndex >= 0) lightbox.classList.add('is-gallery');
 
@@ -252,6 +261,7 @@ function navigateLightbox(direction) {
   const ar   = parseFloat(tile?.dataset.ar) || 16 / 9;
 
   setLightboxVideo(id, ar);
+  if (lightboxTitle) lightboxTitle.textContent = tile?.dataset.title || '';
 }
 
 function closeLightbox() {
@@ -261,6 +271,7 @@ function closeLightbox() {
 
   lightboxVimeo.innerHTML = '';
   lightboxVimeo.classList.remove('active');
+  if (lightboxTitle) lightboxTitle.textContent = '';
 
   lightboxInner.style.width  = '';
   lightboxInner.style.height = '';
@@ -334,9 +345,9 @@ function buildGalleryTile({ id, title, thumbnailUrl, ar }, index) {
   if (title) titleEl.textContent = title;
   tile.appendChild(titleEl);
 
-  tile.addEventListener('click', () => openVimeoLightbox(id, parseFloat(tile.dataset.ar), index));
+  tile.addEventListener('click', () => openVimeoLightbox(id, parseFloat(tile.dataset.ar), index, tile.dataset.title));
   tile.addEventListener('keydown', e => {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openVimeoLightbox(id, parseFloat(tile.dataset.ar), index); }
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openVimeoLightbox(id, parseFloat(tile.dataset.ar), index, tile.dataset.title); }
   });
 
   return tile;
@@ -414,9 +425,10 @@ async function loadGallery() {
         const titleEl = tile.querySelector('.gallery-tile__title');
         if (img && data.thumbnail_url) img.src = data.thumbnail_url;
         if (data.title) {
+          tile.dataset.title = data.title;
           tile.setAttribute('aria-label', `Play: ${data.title}`);
           if (img) img.alt = data.title;
-          if (titleEl) titleEl.textContent = data.title;
+          if (titleEl) titleEl.textContent = data.title.split(',')[0].trim();
         }
         if (data.width && data.height) tile.dataset.ar = data.width / data.height;
       })
