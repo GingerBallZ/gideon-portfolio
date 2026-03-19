@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<!-- code v3.0-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Creative Video Producer | Atlanta, GA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://use.typekit.net/myb6dzy.css" />
+  <link rel="icon" href="images/favicon/favicon.ico" />
+  <meta name="description" content="Gideon Cohen – Creative Producer Portfolio" />
+  <meta property="og:title" content="Gideon Cohen | Creative Producer" />
+  <meta property="og:type" content="website" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="nav-container">
+      <a href="#" class="site-logo">
+        <img id="logo-primary" src="images/logos/gbz_full_cp_revhorz_h90x.svg" alt="Gideon Cohen Creative Producer logo" />
+      </a>
+      <nav class="main-nav" role="navigation">
+        <ul class="nav-links">
+          <li><a href="#work">Work</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+        <button id="hamburger" class="hamburger" aria-label="Toggle menu" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Fullscreen Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; flex: 1;">
+      <a href="#work">Work</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <nav class="footer-icons" aria-label="Social Media">
+      <a href="https://linkedin.com/in/gideonacohen" aria-label="LinkedIn Profile" target="_blank" rel="noopener">
+        <img src="images/icons/linkedin.png" alt="LinkedIn Icon">
+      </a>
+      <a href="https://vimeo.com/gideoncohen" aria-label="Vimeo Page" target="_blank" rel="noopener">
+        <img src="images/icons/vimeo.png" alt="Vimeo Icon">
+      </a>
+      <a href="#contact" aria-label="Contact">
+        <img src="images/icons/envelope.png" alt="Contact Icon">
+      </a>
+    </nav>
+  </div>
+
+  <!-- Fixed background video (behind all content) -->
+  <video class="video-bg" autoplay muted loop playsinline aria-hidden="true">
+    <source src="video/video-bg.mp4" type="video/mp4">
+  </video>
+
+  <!-- Main Content -->
+  <main>
+    <section class="video-hero" id="hero">
+      <div class="video-hero__overlay"></div>
+      <div class="video-hero__content">
+        <div class="video-hero__logo-wrap">
+          <img id="logo-hero" src="images/logos/gbz_full_cp_revhorz_h90x.svg" alt="Gideon Cohen Creative Producer logo" />
+        </div>
+        <p class="video-hero__subline">Atlanta, GA</p>
+        <button class="play-btn" id="playBtn" aria-label="Play Latest Show Reel">
+          <img src="images/icons/play-overlay-white.svg" alt="" class="play-btn__icon">
+          <span class="play-btn__label">Play Latest Show Reel</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Video Gallery -->
+    <section class="gallery" id="work">
+      <div class="gallery-grid" id="galleryGrid"></div>
+    </section>
+  </main>
+
+  <footer>
+    <nav class="footer-icons" aria-label="Social Media">
+      <a href="https://linkedin.com/in/gideonacohen" aria-label="LinkedIn Profile" target="_blank" rel="noopener">
+        <img src="images/icons/linkedin.png" alt="LinkedIn Icon">
+      </a>
+      <a href="https://vimeo.com/gideoncohen" aria-label="Vimeo Page" target="_blank" rel="noopener">
+        <img src="images/icons/vimeo.png" alt="Vimeo Icon">
+      </a>
+      <a href="#contact" aria-label="Contact">
+        <img src="images/icons/envelope.png" alt="Contact Icon">
+      </a>
+    </nav>
+  </footer>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Video player">
+    <div class="lightbox__inner" id="lightboxInner">
+      <button class="lightbox__close" id="lightboxClose" aria-label="Close video">
+        <span></span>
+        <span></span>
+      </button>
+      <!-- Gallery item (Vimeo iframe) -->
+      <div class="lightbox__vimeo" id="lightboxVimeo"></div>
+      <button class="lightbox__arrow lightbox__prev" id="lightboxPrev" aria-label="Previous video">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="lightbox__arrow lightbox__next" id="lightboxNext" aria-label="Next video">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Scroll hint -->
+  <div class="scroll-hint" id="scrollHint" aria-hidden="true">
+    <svg viewBox="0 0 32 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M4 3l12 11L28 3" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.45"/>
+      <path d="M4 11l12 11L28 11" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
