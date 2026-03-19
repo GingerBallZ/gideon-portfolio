@@ -184,6 +184,7 @@ const bgVideo        = document.querySelector('.video-bg');
 const SHOW_REEL_ID = '1174593058';
 
 let currentGalleryIndex = -1;
+let galleryIdsOrdered   = []; // reordered IDs matching DOM tile order
 
 function pauseBgVideo() {
   if (bgVideo) bgVideo.pause();
@@ -243,9 +244,10 @@ function openVimeoLightbox(videoId, aspectRatio, galleryIndex) {
 function navigateLightbox(direction) {
   if (currentGalleryIndex < 0) return;
   // Wrap around: last → first, first → last
-  currentGalleryIndex = (currentGalleryIndex + direction + GALLERY_IDS.length) % GALLERY_IDS.length;
+  // Use galleryIdsOrdered so the index matches the reordered DOM tile order
+  currentGalleryIndex = (currentGalleryIndex + direction + galleryIdsOrdered.length) % galleryIdsOrdered.length;
 
-  const id   = GALLERY_IDS[currentGalleryIndex];
+  const id   = galleryIdsOrdered[currentGalleryIndex];
   const tile = document.querySelectorAll('.gallery-tile')[currentGalleryIndex];
   const ar   = parseFloat(tile?.dataset.ar) || 16 / 9;
 
@@ -393,7 +395,8 @@ async function loadGallery() {
   if (!grid) return;
 
   const numCols = window.innerWidth <= 480 ? 1 : window.innerWidth <= 800 ? 2 : 4;
-  const ids = reorderForColumns(GALLERY_IDS, numCols);
+  galleryIdsOrdered = reorderForColumns(GALLERY_IDS, numCols);
+  const ids = galleryIdsOrdered;
 
   // Build all tiles immediately so the grid renders without waiting for oEmbed
   const tiles = ids.map((id, i) => {

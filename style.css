@@ -293,7 +293,7 @@ footer {
 .video-hero__overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.35);
+  background: rgba(0, 0, 0, 0.10);
   z-index: 0;
   pointer-events: none;
 }
@@ -518,11 +518,11 @@ footer {
   border: none;
 }
 
-/* Close button */
+/* Close button — anchored to top-right corner of 16:9 reference frame */
 .lightbox__close {
   position: absolute;
-  top: -2.25rem;
-  right: 0;
+  top:   calc(50% - var(--lb-ref-h) / 2 - 2.25rem);
+  right: calc(50% - var(--lb-ref-w) / 2);
   background: none;
   border: none;
   cursor: pointer;
@@ -561,7 +561,13 @@ footer {
   background: #fff;
 }
 
-/* Lightbox prev / next arrows — inside the video frame, at left/right edges */
+/* Lightbox prev / next arrows — fixed at the edges of a 16:9 reference box,
+   independent of the actual video aspect ratio */
+.lightbox {
+  --lb-ref-w: min(90vw, calc(85vh * 16 / 9));
+  --lb-ref-h: min(85vh, calc(90vw * 9 / 16));
+}
+
 .lightbox__arrow {
   position: absolute;
   top: 50%;
@@ -593,9 +599,9 @@ footer {
   height: 28px;
 }
 
-/* Right arrow aligns with the close button's right edge */
-.lightbox__next { right: 0; }
-.lightbox__prev { left: 0; }
+/* Anchored to the left/right edges of a 16:9 reference frame, centered in the viewport */
+.lightbox__prev { left:  calc(50% - var(--lb-ref-w) / 2 - 44px); }
+.lightbox__next { left:  calc(50% + var(--lb-ref-w) / 2); }
 
 /* === Scroll hint === */
 .scroll-hint {

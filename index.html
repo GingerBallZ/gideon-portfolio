@@ -100,19 +100,20 @@
   <!-- Lightbox -->
   <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Video player">
     <div class="lightbox__inner" id="lightboxInner">
-      <button class="lightbox__close" id="lightboxClose" aria-label="Close video">
-        <span></span>
-        <span></span>
-      </button>
       <!-- Gallery item (Vimeo iframe) -->
       <div class="lightbox__vimeo" id="lightboxVimeo"></div>
-      <button class="lightbox__arrow lightbox__prev" id="lightboxPrev" aria-label="Previous video">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-      <button class="lightbox__arrow lightbox__next" id="lightboxNext" aria-label="Next video">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
     </div>
+    <!-- Close button and arrows outside lightbox__inner so they stay fixed at 16:9 reference edges -->
+    <button class="lightbox__close" id="lightboxClose" aria-label="Close video">
+      <span></span>
+      <span></span>
+    </button>
+    <button class="lightbox__arrow lightbox__prev" id="lightboxPrev" aria-label="Previous video">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button class="lightbox__arrow lightbox__next" id="lightboxNext" aria-label="Next video">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
   </div>
 
   <!-- Scroll hint -->
