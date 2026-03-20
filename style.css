@@ -13,6 +13,7 @@
 html {
   overflow-x: hidden;
   scroll-behavior: smooth;
+  scroll-snap-type: y mandatory;
   scrollbar-gutter: stable;
 }
 
@@ -471,6 +472,95 @@ footer {
 @media (max-width: 480px) {
   .gallery-grid {
     columns: 1;
+  }
+}
+
+/* === Featured Section === */
+.featured {
+  position: relative;
+  z-index: 2;
+  background: #fff;
+  height: 100vh;
+  height: 100dvh;
+  padding: calc(var(--nav-height) + 1.5rem) 1.5rem 1.5rem;
+  box-sizing: border-box;
+  display: flex;
+  align-items: stretch;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.featured-grid {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+}
+
+/* Left column: "WORK" label at top, large tile pushed to bottom */
+.featured-left {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+/* Right column: two tiles stacked, pushed to bottom */
+.featured-right {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 1rem;
+  min-width: 0;
+}
+
+/* Section label in the open space above the left tile */
+.featured-label {
+  font-family: var(--font-family);
+  font-size: clamp(3rem, 6vw, 6rem);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-bg);
+  line-height: 1;
+  margin: 0;
+}
+
+/* All 3 featured tiles maintain 16:9 based on column width */
+.featured-left .gallery-tile,
+.featured-right .gallery-tile {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.featured-grid .gallery-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (max-width: 800px) {
+  .featured {
+    height: auto;
+    min-height: 100dvh;
+    padding: calc(var(--nav-height) + 1rem) 0.75rem 0.75rem;
+  }
+
+  .featured-grid {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .featured-left,
+  .featured-right {
+    justify-content: flex-start;
+  }
+
+  .featured-label {
+    font-size: clamp(2rem, 10vw, 3.5rem);
+    margin-bottom: 0.75rem;
   }
 }
 

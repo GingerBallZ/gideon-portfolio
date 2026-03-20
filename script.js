@@ -186,6 +186,7 @@ const SHOW_REEL_ID = '1174593058';
 
 let currentGalleryIndex = -1;
 let galleryIdsOrdered   = []; // reordered IDs matching DOM tile order
+let tileRegistry        = []; // tile elements indexed by galleryIdsOrdered position
 
 function pauseBgVideo() {
   if (bgVideo) bgVideo.pause();
@@ -257,7 +258,7 @@ function navigateLightbox(direction) {
   currentGalleryIndex = (currentGalleryIndex + direction + galleryIdsOrdered.length) % galleryIdsOrdered.length;
 
   const id   = galleryIdsOrdered[currentGalleryIndex];
-  const tile = document.querySelectorAll('.gallery-tile')[currentGalleryIndex];
+  const tile = tileRegistry[currentGalleryIndex];
   const ar   = parseFloat(tile?.dataset.ar) || 16 / 9;
 
   setLightboxVideo(id, ar);
@@ -302,20 +303,20 @@ document.addEventListener('keydown', e => {
 
 // Converts a left-to-right row-ordered array into CSS columns column-first order.
 // E.g. [1,2,3,4,5,6] with 2 cols → [1,3,5,2,4,6] so col1=[1,3,5], col2=[2,4,6]
-function reorderForColumns(ids, numCols) {
-  if (numCols <= 1) return ids.slice();
-  const result = [];
-  for (let col = 0; col < numCols; col++) {
-    let row = 0;
-    while (true) {
-      const idx = row * numCols + col;
-      if (idx >= ids.length) break;
-      result.push(ids[idx]);
-      row++;
-    }
-  }
-  return result;
-}
+// function reorderForColumns(ids, numCols) {
+//   if (numCols <= 1) return ids.slice();
+//   const result = [];
+//   for (let col = 0; col < numCols; col++) {
+//     let row = 0;
+//     while (true) {
+//       const idx = row * numCols + col;
+//       if (idx >= ids.length) break;
+//       result.push(ids[idx]);
+//       row++;
+//     }
+//   }
+//   return result;
+// }
 
 function buildGalleryTile({ id, title, thumbnailUrl, ar }, index) {
   const tile = document.createElement('div');
@@ -354,85 +355,89 @@ function buildGalleryTile({ id, title, thumbnailUrl, ar }, index) {
 }
 
 const GALLERY_IDS = [
-  '1150541356',  // TruGreen — Extra Free Time [9:16]
-  '1125612501',  // SAS Viya — Freaking Out [16:9]
-  '1052404044',  // TruGreen — Tea Time [16:9]
-  '908389951',   // Mazda — One Word [16:9]
-  '896584902',   // Powerade — Mathilde Gros "World Champ" [1:1]
-  '912667614',   // Dick's Sporting Goods Softball — Product Assortment 01 [9:16]
-  '1151716586',  // AstraZeneca - AirSupra — Break Free [16:9]
-  '912662194',   // Dick's Sporting Goods Baseball — Bats Assortment [1:1]
-  '372097235',   // Synovus — Game Time Starts Here [16:9]
-  '729270668',   // Sam's Club — Member's Mark [16:9]
-  '896584706',   // Powerade — Alberto Abarza "Spirit of Sport" [9:16]
-  '1149511962',  // Mazda — Superfans Episode 1: Jackie [16:9]
-  '912665081',   // Dick's Sporting Goods Baseball — Scoreboard Loop [9:16]
-  '478598191',   // MedExpress — Urgent Caring [16:9]
-  '372097175',   // Synovus — Drop The Puck Build The City [16:9]
-  '918098215',   // Sam's Club — Back to the Club [16:9]
-  '896585894',   // Powerade — Tyler Wright "Comeback Queen" [1:1]
-  '1150541384',  // TruGreen — Water Hazard [9:16]
-  '912697641',   // Dick's Sporting Goods Softball — Gloves Showcase [1:1]
-  '912784508',   // Checkers & Rally's — Baconpalooza [16:9]
-  '984475356',   // Wahl — What Are We Making? [16:9]
-  '728884860',   // Sam's Club — Summer S'mores [9:16]
-  '896584419',   // Powerade — Harrie Lavreysen "Golden Wink" [1:1]
-  '1150541365',  // TruGreen — Patton's Bunker [9:16]
-  '330243510',   // Checkers & Rally's — Chill Stop [16:9]
-  '1125613054',  // SAS Viya — Staying Late [16:9]
-  '728884461',   // Sam's Club — Summer Floating [9:16]
-  '912663990',   // Dick's Sporting Goods Baseball — Glitch Setup [9:16]
-  '896584532',   // Powerade — Emma Twigg "Retireless" [1:1]
-  '478599962',   // AHA — Multiflavor [16:9]
-  '1125613493',  // SAS Viya — Sacrifice [16:9]
-  '912665244',   // Dick's Sporting Goods Softball — Swing Away [9:16]
-  '912054660',   // Cholula — La Familia [16:9]
-  '986568224',   // bp Earnify — Points Family [16:9]
-  '912786798',   // bp Fuels — Keep It Going [16:9]
-  '896585706',   // Powerade — Tyler Wright BTS [9:16]
-  '912793086',   // Dick's Sporting Goods — Sports Matter Day Chicago [16:9]
-  '918122530',   // Southern Company — Smart Energy [21:9]
-  '912657016',   // Georgia Power — Here for Georgia [16:9]
-  '409861382',   // French's — The Color of American Flavor [16:9]
-  '728884672',   // Sam's Club — Summer Cookout [9:16]
-  '912793376',   // Dick's Sporting Goods — Sports Matter Day Atlanta [16:9]
-  '240327879',   // GameTap — Computer Lab [4:3]
-  '240327853',   // GameTap — Tapped In [4:3]
-  '240327769',   // GameTap — Pixelated and Debated [16:9]
+ '896584902',   // Powerade — Mathilde Gros "World Champ" [1:1]
+ '912667614',   // Dick's Sporting Goods Softball — Ice Cold [9:16]
+ '912784508',   // Checkers & Rally's — Baconpalooza [16:9]
+ '1125613054',  // SAS Viya — Staying Late [16:9]
+ '1150541356',  // TruGreen — Extra Free Time [9:16]
+ '729270668',   // Sam's Club — Member's Mark [16:9]
+ '984475356',   // Wahl — What Are We Making? [16:9]
+ '1150541384',  // TruGreen — Water Hazard [9:16]
+ '912665081',   // Dick's Sporting Goods Baseball — Scoreboard Loop [9:16]
+ '1149511962',  // Mazda — Superfans Episode 1: Jackie [16:9]
+ '912697641',   // Dick's Sporting Goods Softball — Gloves Showcase [1:1]
+ '896584419',   // Powerade — Harrie Lavreysen "Golden Wink" [1:1]
+ '918122530',   // Southern Company — Smart Energy [21:9]
+ '896585894',   // Powerade — Tyler Wright "Comeback Queen" [1:1]
+ '1151716586',  // AstraZeneca - AirSupra — Break Free [16:9]
+ '728884762',   // Sam's Club — Summer Shades [9:16]
+ '918098215',   // Sam's Club — Back to the Club [16:9]
+ '912659432',   // Dick's Sporting Goods Baseball — Stealing 2nd [9:16]
+ '597273338',   // Camp Sunshine — Intro [9:16]
+ '330243510',   // Checkers & Rally's — Chill Stop [16:9]
+ '478599962',   // AHA — Multiflavor [16:9]
+ '896584532',   // Powerade — Emma Twigg "Retireless" [1:1]
+ '986568224',   // bp Earnify — Points Family [16:9]
+ '896584706',   // Powerade — Alberto Abarza "Spirit of Sport" [9:16]
+ '912054660',   // Cholula — La Familia [16:9]
+ '1125613493',  // SAS Viya — Sacrifice [16:9]
 ];
+
+// Featured videos — appear in featured section; appended at the end of navigation order.
+// Nav wraps: last gallery tile → right → 1052404044 → 908389951 → 1125612501 → first gallery tile
+const FEATURED_IDS = ['1052404044', '908389951', '1125612501'];
+
+// Fetches oEmbed metadata and populates a tile's image, title, and aspect ratio
+function fetchTileMeta(tile, id) {
+  fetch(`https://vimeo.com/api/oembed.json?url=https://vimeo.com/${id}&width=640`)
+    .then(r => r.json())
+    .then(data => {
+      const img     = tile.querySelector('img');
+      const titleEl = tile.querySelector('.gallery-tile__title');
+      if (img && data.thumbnail_url) img.src = data.thumbnail_url;
+      if (data.title) {
+        tile.dataset.title = data.title;
+        tile.setAttribute('aria-label', `Play: ${data.title}`);
+        if (img) img.alt = data.title;
+        if (titleEl) titleEl.textContent = data.title.split(',')[0].trim();
+      }
+      if (data.width && data.height) tile.dataset.ar = data.width / data.height;
+    })
+    .catch(() => {});
+}
 
 async function loadGallery() {
   const grid = document.getElementById('galleryGrid');
   if (!grid) return;
 
-  const numCols = window.innerWidth <= 480 ? 1 : window.innerWidth <= 800 ? 2 : 4;
-  galleryIdsOrdered = reorderForColumns(GALLERY_IDS, numCols);
-  const ids = galleryIdsOrdered;
+  // const numCols = window.innerWidth <= 480 ? 1 : window.innerWidth <= 800 ? 2 : 4;
+  // Navigation order: gallery tiles in array order, then featured in wrap order
+  galleryIdsOrdered = [...GALLERY_IDS, ...FEATURED_IDS];
 
-  // Build all tiles immediately so the grid renders without waiting for oEmbed
-  const tiles = ids.map((id, i) => {
+  // Build all gallery tiles immediately so the grid renders without waiting for oEmbed
+  galleryIdsOrdered.slice(0, GALLERY_IDS.length).forEach((id, i) => {
     const tile = buildGalleryTile({ id, title: '', thumbnailUrl: '', ar: 16 / 9 }, i);
     grid.appendChild(tile);
-    return { tile, id };
+    tileRegistry[i] = tile;
+    fetchTileMeta(tile, id);
   });
+}
 
-  // Fetch oEmbed metadata in parallel to populate thumbnails, titles, and aspect ratios
-  tiles.forEach(({ tile, id }) => {
-    fetch(`https://vimeo.com/api/oembed.json?url=https://vimeo.com/${id}&width=640`)
-      .then(r => r.json())
-      .then(data => {
-        const img     = tile.querySelector('img');
-        const titleEl = tile.querySelector('.gallery-tile__title');
-        if (img && data.thumbnail_url) img.src = data.thumbnail_url;
-        if (data.title) {
-          tile.dataset.title = data.title;
-          tile.setAttribute('aria-label', `Play: ${data.title}`);
-          if (img) img.alt = data.title;
-          if (titleEl) titleEl.textContent = data.title.split(',')[0].trim();
-        }
-        if (data.width && data.height) tile.dataset.ar = data.width / data.height;
-      })
-      .catch(() => {});
+// ─── Featured section ─────────────────────────────────────────────────────────
+// Builds the three featured tiles and registers them at the end of tileRegistry.
+// Must be called after loadGallery() so galleryIdsOrdered is already set.
+function loadFeatured() {
+  const leftCol  = document.getElementById('featuredLeft');
+  const rightCol = document.getElementById('featuredRight');
+  if (!leftCol || !rightCol) return;
+
+  const startIndex = GALLERY_IDS.length; // featured tiles start at index 42
+  FEATURED_IDS.forEach((id, i) => {
+    const navIndex = startIndex + i;
+    const tile = buildGalleryTile({ id, title: '', thumbnailUrl: '', ar: 16 / 9 }, navIndex);
+    (i === 0 ? leftCol : rightCol).appendChild(tile);
+    tileRegistry[navIndex] = tile;
+    fetchTileMeta(tile, id);
   });
 }
 
@@ -488,6 +493,7 @@ window.addEventListener('DOMContentLoaded', () => {
   updateLogoTransition();
   updateHeaderBg();
   loadGallery();
+  loadFeatured();
 });
 
 // Re-cache after all resources load — SVG image dimensions may not be settled
