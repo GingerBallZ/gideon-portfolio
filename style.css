@@ -496,17 +496,8 @@ footer {
   width: 100%;
 }
 
-/* Left column: "WORK" label at top, large tile pushed to bottom */
+/* Left column: two tiles stacked, pushed to bottom */
 .featured-left {
-  flex: 3;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-width: 0;
-}
-
-/* Right column: two tiles stacked, pushed to bottom */
-.featured-right {
   flex: 2;
   display: flex;
   flex-direction: column;
@@ -515,7 +506,17 @@ footer {
   min-width: 0;
 }
 
-/* Section label in the open space above the left tile */
+/* Right column: "WORK" label floated by JS, large tile pushed to bottom */
+.featured-right {
+  flex: 3;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+/* Section label — absolutely positioned by JS on desktop */
 .featured-label {
   font-family: var(--font-family);
   font-size: clamp(3rem, 6vw, 6rem);
@@ -525,6 +526,9 @@ footer {
   color: var(--color-bg);
   line-height: 1;
   margin: 0;
+  position: absolute;
+  right: 0;
+  text-align: right;
 }
 
 /* All 3 featured tiles maintain 16:9 based on column width */
@@ -545,7 +549,7 @@ footer {
   .featured {
     height: auto;
     min-height: 100dvh;
-    padding: calc(var(--nav-height) + 1rem) 0.75rem 0.75rem;
+    padding: calc(var(--nav-height) + 0.25rem) 0.75rem 0.75rem;
   }
 
   .featured-grid {
@@ -558,24 +562,33 @@ footer {
     justify-content: flex-start;
   }
 
+  .featured-left  { order: -1; } /* stacked tiles (908389951, 1125612501) appear first on mobile */
+  .featured-right { order:  0; } /* big tile (1052404044) appears second on mobile */
+
   .featured-label {
+    position: static;
     font-size: clamp(2rem, 10vw, 3.5rem);
     margin-bottom: 0.75rem;
   }
 }
+
 
 /* === Lightbox === */
 .lightbox {
   position: fixed;
   inset: 0;
   z-index: 10001;
-  background: rgba(0, 0, 0, 0.82);
+  background: rgba(0, 0, 0, 0.92);
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.35s ease;
+  /* 16:9 reference frame — close button and nav arrows are anchored to this,
+     independent of the actual playing video's aspect ratio */
+  --lb-ref-w: min(90vw, calc(85vh * 16 / 9));
+  --lb-ref-h: min(85vh, calc(90vw * 9 / 16));
 }
 
 .lightbox.is-open {
@@ -583,11 +596,15 @@ footer {
   pointer-events: auto;
 }
 
+/* On wide screens, shift vertical centering upward to make room for the ribbon */
+@media (min-width: 1024px) {
+  .lightbox.is-gallery {
+    padding-bottom: 167px; /* ribbon height (157px) + 10px gap */
+  }
+}
+
 .lightbox__inner {
   position: relative;
-  /* Default sizing for local video */
-  width: 90vw;
-  max-width: 1200px;
 }
 
 /* Vimeo iframe container */
@@ -608,7 +625,115 @@ footer {
   border: none;
 }
 
-/* Close button — anchored to top-right corner of 16:9 reference frame */
+/* === Lightbox end screen (new design) === */
+/* Fills the video area: thumbnail at 70% opacity + centered overlay + replay button */
+.lightbox__end-screen {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: #000;
+  overflow: hidden;
+}
+
+.lightbox__end-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0.7;
+}
+
+.lightbox__end-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* === Below-frame meta (client + title) — single line, always visible when gallery video is open === */
+/* Absolutely positioned below the video frame; width/top set by JS to match frame */
+.lightbox__meta {
+  position: absolute;
+  display: none; /* shown by JS */
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.4em;
+  overflow: hidden;
+  flex-wrap: nowrap;
+  pointer-events: none;
+  z-index: 10003;
+}
+
+/* Client and title share the same size; weight and color distinguish them */
+.lightbox__meta-client,
+.lightbox__meta-title {
+  font-family: var(--font-family);
+  font-size: clamp(0.75rem, 1.1vw, 1rem);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.lightbox__meta-client {
+  font-weight: 600;
+  color: #fff;
+  flex-shrink: 0; /* client name never truncates */
+}
+
+.lightbox__meta-title {
+  font-weight: 600;
+  color: #fff;
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Replay button (end screen) and play icon (paused screen) */
+.lightbox__end-replay,
+.lightbox__end-play {
+  background: none;
+  border: none;
+  padding: 0.4rem;
+  color: rgba(255, 255, 255, 0.7);
+  transition: color var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Replay button is interactive; play icon is decorative (screen handles click) */
+.lightbox__end-replay {
+  cursor: pointer;
+}
+
+/* Paused screen (nav/ribbon click): entire thumbnail area is the click target */
+.lightbox__end-screen--paused {
+  cursor: pointer;
+}
+
+.lightbox__end-screen--paused:hover .lightbox__end-play {
+  color: #fff;
+}
+
+.lightbox__end-replay:hover,
+.lightbox__end-play:hover {
+  color: #fff;
+}
+
+.lightbox__end-replay svg,
+.lightbox__end-play svg {
+  width: clamp(35px, 4.375vw, 50px);
+  height: auto;
+  display: block;
+}
+
+/* Close button — anchored to top-right corner of the 16:9 reference frame,
+   fixed regardless of the playing video's aspect ratio */
 .lightbox__close {
   position: absolute;
   top:   calc(50% - var(--lb-ref-h) / 2 - 2.25rem);
@@ -651,24 +776,7 @@ footer {
   background: #fff;
 }
 
-/* Lightbox title — positioned via JS to align with actual video edges */
-.lightbox__title {
-  position: absolute;
-  font-family: var(--font-family);
-  font-size: clamp(0.75rem, 1.1vw, 0.9rem);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.7);
-  pointer-events: none;
-}
-
-/* Lightbox prev / next arrows — fixed at the edges of a 16:9 reference box,
-   independent of the actual video aspect ratio */
-.lightbox {
-  --lb-ref-w: min(90vw, calc(85vh * 16 / 9));
-  --lb-ref-h: min(85vh, calc(90vw * 9 / 16));
-}
-
+/* Nav arrows — locked to 16:9 reference frame edges, fixed regardless of video AR */
 .lightbox__arrow {
   position: absolute;
   top: 50%;
@@ -677,7 +785,7 @@ footer {
   border: none;
   cursor: pointer;
   width: 44px;
-  height: 44px;
+  height: 72px;
   display: none;
   align-items: center;
   justify-content: center;
@@ -685,6 +793,14 @@ footer {
   padding: 0;
   color: color-mix(in srgb, var(--color-hover), white 15%);
   transition: color var(--transition-fast);
+}
+
+/* When ribbon is visible, shift arrows up so they center in the video area,
+   not in the full lightbox (which includes the 167px ribbon+gap at the bottom) */
+@media (min-width: 1024px) {
+  .lightbox.is-gallery .lightbox__arrow {
+    top: calc(50% - 83.5px);
+  }
 }
 
 .lightbox.is-open.is-gallery .lightbox__arrow {
@@ -700,9 +816,210 @@ footer {
   height: 28px;
 }
 
-/* Anchored to the left/right edges of a 16:9 reference frame, centered in the viewport */
 .lightbox__prev { left:  calc(50% - var(--lb-ref-w) / 2 - 44px); }
 .lightbox__next { left:  calc(50% + var(--lb-ref-w) / 2); }
+
+/* === Lightbox ribbon === */
+/* Full-viewport-width filmstrip pinned to the bottom of the lightbox overlay.
+   Desktop only (>= 1024px). */
+.lightbox__ribbon {
+  display: none; /* shown via media query below */
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 157px;
+  background: #000;
+}
+
+@media (min-width: 1024px) {
+  .lightbox.is-gallery .lightbox__ribbon {
+    display: flex;
+    align-items: stretch;
+  }
+}
+
+/* Ribbon scroll track — fills space between nav arrows */
+.lightbox__ribbon-track {
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  box-sizing: border-box;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.lightbox__ribbon-track::-webkit-scrollbar {
+  display: none;
+}
+
+/* Ribbon prev/next scroll buttons */
+.ribbon__nav {
+  flex: 0 0 44px;
+  height: 100%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.6);
+  transition: color var(--transition-fast);
+  z-index: 1;
+}
+
+.ribbon__nav--prev { background: linear-gradient(to right, rgba(0,0,0,0.85) 60%, transparent); }
+.ribbon__nav--next { background: linear-gradient(to left,  rgba(0,0,0,0.85) 60%, transparent); }
+
+.ribbon__nav:hover {
+  color: #fff;
+}
+
+.ribbon__nav svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Individual ribbon tile — height fixed at 157px; width set by JS (AR × 157px) */
+.ribbon-tile {
+  flex: 0 0 auto; /* width set inline by JS */
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background: #111;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.ribbon-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.2s ease;
+}
+
+/* Hover overlay: client + title (upper left), play button (center), duration (lower left) */
+.ribbon-tile__hover {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.52);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.ribbon-tile:not(.is-active):hover .ribbon-tile__hover {
+  opacity: 1;
+}
+
+.ribbon-tile:not(.is-active):hover img {
+  opacity: 0.6;
+}
+
+/* Client name + video title: upper left */
+.ribbon-tile__hover-meta {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.55rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  max-width: calc(100% - 1.1rem);
+}
+
+.ribbon-tile__hover-client {
+  font-family: var(--font-family);
+  font-size: 0.5rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ribbon-tile__hover-title {
+  font-family: var(--font-family);
+  font-size: 0.58rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Play button: centered (same proportions as gallery tile play icon) */
+.ribbon-tile__hover-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.ribbon-tile__hover-play svg {
+  width: clamp(28px, 3.5vw, 40px);
+  height: auto;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.6));
+}
+
+/* Duration: lower left */
+.ribbon-tile__hover-dur {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 0.55rem;
+  font-family: var(--font-family);
+  font-size: 0.5rem;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Active (now-playing) state: dim + label */
+.ribbon-tile.is-active img {
+  opacity: 0.45;
+}
+
+.ribbon-tile__playing {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.ribbon-tile.is-active .ribbon-tile__playing {
+  display: flex;
+}
+
+.ribbon-tile__playing span {
+  font-family: var(--font-family);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+/* Hidden at ribbon boundaries — arrow disappears when no further videos in that direction */
+.lightbox__arrow.is-hidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Ribbon scroll buttons hidden when track is already at that edge */
+.ribbon__nav.is-hidden {
+  visibility: hidden;
+  pointer-events: none;
+}
 
 /* === Scroll hint === */
 .scroll-hint {

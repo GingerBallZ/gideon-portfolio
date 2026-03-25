@@ -7,6 +7,8 @@
   <title>Creative Video Producer | Atlanta, GA</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://player.vimeo.com" />
+  <link rel="dns-prefetch" href="https://player.vimeo.com" />
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://use.typekit.net/myb6dzy.css" />
@@ -80,10 +82,10 @@
     <!-- Featured Videos -->
     <section class="featured" id="work" aria-label="Featured work">
       <div class="featured-grid">
-        <div class="featured-left" id="featuredLeft">
+        <div class="featured-left" id="featuredRight"></div>
+        <div class="featured-right" id="featuredLeft">
           <h2 class="featured-label">Work</h2>
         </div>
-        <div class="featured-right" id="featuredRight"></div>
       </div>
     </section>
 
@@ -110,11 +112,21 @@
   <!-- Lightbox -->
   <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Video player">
     <div class="lightbox__inner" id="lightboxInner">
-      <!-- Gallery item (Vimeo iframe) -->
       <div class="lightbox__vimeo" id="lightboxVimeo"></div>
     </div>
-    <!-- Title, close button, and arrows outside lightbox__inner so they stay fixed at 16:9 reference edges -->
-    <div class="lightbox__title" id="lightboxTitle"></div>
+    <!-- Client + title text block, shown below video frame on end/paused screens -->
+    <div class="lightbox__meta" id="lightboxMeta" aria-live="polite"></div>
+    <!-- Thumbnail ribbon — full viewport width, pinned to bottom, desktop only -->
+    <div class="lightbox__ribbon" id="lightboxRibbon" aria-label="All videos">
+      <button class="ribbon__nav ribbon__nav--prev" id="ribbonPrev" aria-label="Scroll ribbon left">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="lightbox__ribbon-track" id="lightboxRibbonTrack"></div>
+      <button class="ribbon__nav ribbon__nav--next" id="ribbonNext" aria-label="Scroll ribbon right">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <!-- Close button and nav arrows: locked to 16:9 reference frame, fixed regardless of video AR -->
     <button class="lightbox__close" id="lightboxClose" aria-label="Close video">
       <span></span>
       <span></span>

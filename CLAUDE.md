@@ -9,14 +9,23 @@ Goal: present video work beautifully and let visitors browse/watch easily.
 ---
 
 ## Current Status
-The home page is functional. All known bugs from initial development have been resolved:
-- Logo scroll transition (hero ↔ nav handoff) — working
-- Background video — working (local `.mp4` at `video/video-bg.mp4`)
-- Show reel lightbox — working (Vimeo iframe via `openVimeoLightbox()`, ID `1174593058`)
-- Gallery tile titles on hover — working
-- Lightbox prev/next navigation — working
+The home page is functional. Session 3 changes (2026-03-25):
+- Lightbox ribbon built: full-width filmstrip pinned to bottom, desktop only (≥1024px)
+- Navigation order: `FEATURED_IDS` lead `galleryIdsOrdered` (indices 0–2), `GALLERY_IDS` follow (indices 3–28). Left boundary: `908389951`; right boundary: `918098215`
+- Ribbon visible → nav arrows hidden at boundaries, no wrap. Ribbon hidden → infinite wrap
+- Ribbon scroll buttons hidden when track is already at that edge
+- Ribbon hover: play button only — no text overlays
+- Paused screen: navigating within lightbox shows thumbnail + play icon; clicking anywhere plays video
+- End screen: thumbnail at 70% opacity + replay button; only replay button is interactive
+- `#lightboxMeta`: single-line "Client Name — Video Title" below video frame, always visible when a gallery video is open (playing, paused, or ended); repositions on resize
+- Lightbox background: 92% opacity
+- Nav arrows: 72px tall, centered in video play area (accounts for ribbon height)
+- Featured mobile order: 908389951 → 1125612501 → 1052404044 (desktop layout unchanged)
 
-**Next up:** populate the gallery with 45 videos in a specific order, then migrate to GitHub + staging server.
+**Next up (in order):**
+1. Adjust featured section layout and "WORK" section header styling
+2. Add "About" section
+3. Add "Contact" section
 
 ---
 
@@ -130,12 +139,19 @@ Mobile logo completes its crossfade 25% sooner (`heroScale = 0.75`) because the 
 Single mode — always a Vimeo iframe. The old `<video>` element approach has been removed.
 
 Key functions:
-- `openVimeoLightbox(videoId, aspectRatio, galleryIndex)` — opens lightbox. If `galleryIndex` is provided, adds `.is-gallery` class to enable prev/next arrows.
-- `setLightboxVideo(videoId, aspectRatio)` — calculates dimensions (fits within 90vw × 85vh), injects iframe.
-- `navigateLightbox(direction)` — advances through `GALLERY_IDS` array, wraps around.
-- `closeLightbox()` — tears down iframe, restores scroll, resumes bg video.
+- `openVimeoLightbox(videoId, aspectRatio, galleryIndex)` — opens lightbox. Gallery index provided → adds `.is-gallery`, builds ribbon, shows meta.
+- `setLightboxVideo(videoId, aspectRatio)` — calculates dimensions (fits within 90vw × 85vh), injects iframe with `autoplay=1`, shows `#lightboxMeta`. Stores dimensions in `currentVideoW/H`.
+- `showLightboxPausedScreen(galleryIndex)` — shown when navigating via arrows or ribbon click. Thumbnail + play icon overlay; clicking anywhere on the frame plays the video. Shows meta below frame.
+- `showLightboxEndScreen()` — shown when a video finishes. Thumbnail at 70% opacity + centered replay button. Meta already visible from playback, no reposition needed.
+- `showLightboxMeta(client, videoTitle, w, h)` / `clearLightboxMeta()` — positions `#lightboxMeta` 8px below the video frame, width-matched to the frame. Shown for all gallery videos (playing/paused/ended); cleared for show reel and on close.
+- `navigateLightbox(direction)` — shows paused screen for next video (does NOT auto-play). Clamps at boundaries when ribbon visible; wraps infinitely on mobile.
+- `buildRibbon()` / `updateRibbon()` — builds filmstrip from `tileRegistry`; marks active tile, smart-scrolls only if active tile not fully visible. Hides prev/next arrows at boundaries.
+- `updateRibbonNavButtons()` — hides ribbon scroll buttons when track is at left or right edge. Fires on `scroll` event and after `buildRibbon()`.
+- `closeLightbox()` — tears down iframe, clears meta, restores scroll, resumes bg video, cleans up end-behavior listener.
+- `setupEndBehavior(videoId, iframe, isAlreadyReady)` — subscribes to Vimeo `finish` postMessage event; calls `showLightboxEndScreen()` when fired. Skipped for `LOOP_IDS` and show reel.
+- `preloadVimeoPlayer(videoId)` — on tile `mouseenter`, injects a hidden 1×1 `autoplay=0` iframe to warm the Vimeo player JS cache. Max 3 preloads kept alive (`PRELOAD_MAX`).
 
-Show reel: `openVimeoLightbox('1174593058', 16/9)` — no gallery index, so no arrows.
+Show reel: `openVimeoLightbox('1174593058', 16/9)` — no ribbon, no arrows, no end screen, no meta.
 Backdrop clicks do NOT close the lightbox — only the close button or ESC key.
 Keyboard: ESC closes, ArrowLeft/ArrowRight navigates.
 
@@ -148,12 +164,14 @@ Scroll hint: pauses while show reel is open; resumes 2s after closing.
 
 ## Gallery
 Videos defined as `GALLERY_IDS` array of Vimeo ID strings in `script.js`.
-Currently 8 videos — **expanding to 45 videos is the next task.**
+Currently 26 videos in `GALLERY_IDS` + 3 in `FEATURED_IDS`.
 
 `loadGallery()`:
-- Builds all tiles immediately (blank thumbnails) so grid renders without waiting for network
-- Fetches oEmbed metadata in parallel (thumbnail, title, aspect ratio) and populates tiles
+- Sets `galleryIdsOrdered = [...FEATURED_IDS, ...GALLERY_IDS]` — featured at indices 0–2, gallery at 3–28
+- Defers tile rendering until `#work` section enters viewport (IntersectionObserver, `rootMargin: 200px`)
+- When triggered, renders all tiles at once — no batching, no layout shift
 - Tiles are built by `buildGalleryTile({ id, title, thumbnailUrl, ar }, index)`
+- Each tile gets a `mouseenter` listener that calls `preloadVimeoPlayer(id)`
 
 Grid layout: CSS `columns: 4` (masonry-style, not fixed grid). Tiles are not forced to square — they render at their natural aspect ratio. Mobile: 2 columns at `800px`, 1 column at `480px`.
 
@@ -219,7 +237,7 @@ Returns: `thumbnail_url`, `title`, `width`, `height`
 - Do NOT use TypeScript
 - Do NOT add Tailwind
 - Do NOT add auth, user accounts, a database, or a CMS unless explicitly asked
-- Do NOT use inline styles — CSS classes and variables only
+- Do NOT use inline styles — CSS classes and variables only, **except** for dynamic values that must be calculated in JS (e.g. pixel positioning of `#lightboxMeta`)
 - Do NOT force gallery cards to uniform size — the masonry layout should breathe
 - Do NOT use Inter, Roboto, or generic system-ui fonts
 - Do NOT use purple gradients or generic "SaaS" aesthetics
